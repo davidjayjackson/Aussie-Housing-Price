@@ -1,0 +1,108 @@
+---
+title: "Aussie Housing Market"
+author: "David Jackson"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(scales)
+library(readxl)
+```
+
+## Aussie Housing Prices (USD)
+
+```{r}
+housing <- read_xlsx("cleaning_house.xlsx",sheet = "RealEstateUS")
+```
+```{r}
+housing$building_square_feet <- as.integer(housing$building_square_feet)
+housing$land_size_square_feet <- as.integer(housing$land_size_square_feet)
+housing$building_price_per_square_foot <- as.integer(housing$building_price_per_square_foot)
+housing$land_price_per_square_foot_us <- as.integer(housing$land_price_per_square_foot_us)
+```
+### Descriptive Statistic
+```{r}
+summary(housing)
+```
+
+### Exploratory Data Analysis
+#### Building Size in Square Feet
+
+```{r}
+housing %>% count(property_type,sort =T) %>% ggplot(aes(x=reorder(property_type,n),y=n)) + geom_col() + coord_flip()
+```
+
+
+```{r}
+ggplot(housing) + geom_histogram(aes(x=building_square_feet),bin =20) +
+  labs(title="Histogram of building square feet") +
+  scale_y_log10() 
+```
+
+```{r}
+ggplot(housing) + geom_boxplot(aes(x=building_square_feet)) +
+  labs(title="Boxplot of building square feet") + facet_wrap(~property_type)
+```
+
+#### Land Size in Square Feet
+
+```{r}
+ggplot(housing) + geom_histogram(aes(x=land_size_square_feet)) +
+  labs(title="Histogram of Land Size square feet") +
+  scale_y_log10() + facet_wrap(~property_type)
+```
+
+```{r}
+ggplot(housing) + geom_boxplot(aes(x=land_size_square_feet)) +
+  labs(title="Boxplot of Land Size square feet") +  facet_wrap(~property_type)
+```
+
+#### Building Price Per Square Feet
+
+```{r}
+ggplot(housing) + geom_histogram(aes(x=building_price_per_square_foot)) +
+  labs(title="Histogram of Building Price per square feet") +
+  scale_y_log10() + facet_wrap(~property_type)
+```
+
+```{r}
+ggplot(housing) + geom_boxplot(aes(x=building_price_per_square_foot)) +
+  labs(title="Boxplot of Building Price Per square feet") +  facet_wrap(~property_type)
+```
+
+#### Land Price Per Square Foot
+
+```{r}
+ggplot(housing) + geom_histogram(aes(x=land_price_per_square_foot_us)) +
+  labs(title="Histogram of Land Price per square feet") +
+  scale_y_log10() + facet_wrap(~property_type)
+```
+
+```{r}
+ggplot(housing) + geom_boxplot(aes(x=land_price_per_square_foot_us)) +
+  labs(title="Boxplot of Land Price Per square feet") +  facet_wrap(~property_type)
+```
+
+### Will the Price per Square Foot Go up as price goes up
+
+```{r}
+ggplot(housing) + geom_point(aes(y=building_square_feet,x=price_usd)) +
+   scale_y_log10(labels = comma) + scale_x_continuous(labels = comma)
+```
+
+```{r}
+ggplot(housing) + geom_point(aes(y=land_size_square_feet,x=price_usd)) +
+   scale_y_log10(labels = comma) + scale_x_continuous(labels = comma)
+```
+```{r}
+ggplot(housing) + geom_point(aes(x=building_square_feet,y=building_price_per_square_foot)) +
+   scale_y_log10(labels = comma) + scale_x_continuous(labels = comma)
+```
+
+```{r}
+ggplot(housing) + geom_point(aes(x=land_size_square_feet,y=land_price_per_square_foot_us)) +
+  scale_y_log10(labels = comma) + scale_x_continuous(labels = comma)
+```
